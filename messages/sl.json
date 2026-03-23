@@ -201,6 +201,29 @@
     "readMore": "Preberi več",
     "noArticles": "Ni člankov v tej kategoriji."
   },
+  "consent": {
+    "title": "Soglasje za zasebnost",
+    "subtitle": "Pred uporabo aplikacije Cikel potrebujemo vaše izrecno soglasje za obdelavo zdravstvenih podatkov v skladu s 9. členom GDPR.",
+    "healthDataLabel": "Soglašam z obdelavo mojih zdravstvenih podatkov (menstrualni cikel, simptomi, razpoloženje)",
+    "healthDataDescription": "To je potrebno za uporabo aplikacije. Vaši zdravstveni podatki se obdelujejo izključno za zagotavljanje funkcij sledenja cikla.",
+    "cyclePredictionsLabel": "Soglašam z avtomatiziranimi napovedmi cikla na podlagi mojih zdravstvenih podatkov",
+    "cyclePredictionsDescription": "To je potrebno za uporabo aplikacije. Vaše podatke uporabljamo za napovedovanje prihodnjih ciklov, plodnih dni in ovulacije.",
+    "requiredNotice": "Obe soglasji sta potrebni za uporabo aplikacije Cikel. Soglasje lahko kadar koli prekličete v Nastavitvah, vendar bo to omejilo vaš dostop do aplikacije.",
+    "submit": "Soglašam in nadaljujem",
+    "bothRequired": "Obe soglasji sta potrebni za nadaljevanje."
+  },
+  "privacy": {
+    "title": "Zasebnost in soglasja",
+    "healthDataConsent": "Obdelava zdravstvenih podatkov",
+    "cyclePredictionsConsent": "Napovedi cikla",
+    "grantedOn": "Podano dne {date}",
+    "notGranted": "Ni podano",
+    "revoke": "Prekliči",
+    "revokeWarning": "Preklic soglasja za obdelavo zdravstvenih podatkov bo blokiral vaš dostop do aplikacije.",
+    "revokeConfirmTitle": "Prekliči soglasje",
+    "revokeConfirmDescription": "Ali ste prepričani, da želite preklicati to soglasje? {warning}",
+    "revoked": "Soglasje preklicano."
+  },
   "settings": {
     "title": "Nastavitve",
     "profile": "Profil",

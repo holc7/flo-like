@@ -20,7 +20,13 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Check, Download, Trash2, LogOut } from "lucide-react";
+import { Check, Download, Trash2, LogOut, ShieldCheck } from "lucide-react";
+
+interface Consent {
+  consent_type: string;
+  granted_at: string | null;
+  revoked_at: string | null;
+}
 
 interface Profile {
   display_name: string | null;
@@ -35,6 +41,7 @@ interface Profile {
 
 export default function SettingsPage() {
   const t = useTranslations("settings");
+  const tp = useTranslations("privacy");
   const tc = useTranslations("common");
   const locale = useLocale();
   const router = useRouter();
@@ -42,6 +49,8 @@ export default function SettingsPage() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showRevokeDialog, setShowRevokeDialog] = useState<string | null>(null);
+  const [consents, setConsents] = useState<Consent[]>([]);
   const [profile, setProfile] = useState<Profile | null>(null);
 
   useEffect(() => {
@@ -57,6 +66,13 @@ export default function SettingsPage() {
         .single();
 
       if (data) setProfile(data);
+
+      const { data: consentData } = await supabase
+        .from("consents")
+        .select("consent_type, granted_at, revoked_at")
+        .eq("user_id", user.id);
+
+      if (consentData) setConsents(consentData);
       setLoading(false);
     }
     fetchProfile();
@@ -117,6 +133,36 @@ export default function SettingsPage() {
     a.download = `cikel-export-${new Date().toISOString().split("T")[0]}.json`;
     a.click();
     URL.revokeObjectURL(url);
+  }
+
+  function getConsent(type: string): Consent | undefined {
+    return consents.find((c) => c.consent_type === type);
+  }
+
+  function isConsentActive(type: string): boolean {
+    const c = getConsent(type);
+    return !!c && !!c.granted_at && !c.revoked_at;
+  }
+
+  async function handleRevokeConsent(type: string) {
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    await supabase
+      .from("consents")
+      .update({ revoked_at: new Date().toISOString() })
+      .eq("user_id", user.id)
+      .eq("consent_type", type);
+
+    setConsents((prev) =>
+      prev.map((c) =>
+        c.consent_type === type
+          ? { ...c, revoked_at: new Date().toISOString() }
+          : c
+      )
+    );
+    setShowRevokeDialog(null);
   }
 
   async function handleDeleteAccount() {
@@ -282,6 +328,82 @@ export default function SettingsPage() {
           tc("save")
         )}
       </Button>
+
+      <Separator />
+
+      {/* Privacy & Consents */}
+      <Card>
+        <CardContent className="space-y-4 pt-6">
+          <div className="flex items-center gap-2">
+            <ShieldCheck className="h-4 w-4 text-primary" />
+            <h3 className="font-medium">{tp("title")}</h3>
+          </div>
+
+          {(["health_data_processing", "cycle_predictions"] as const).map((type) => {
+            const active = isConsentActive(type);
+            const consent = getConsent(type);
+            const label =
+              type === "health_data_processing"
+                ? tp("healthDataConsent")
+                : tp("cyclePredictionsConsent");
+
+            return (
+              <div key={type} className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label>{label}</Label>
+                  <p className="text-xs text-muted-foreground">
+                    {active && consent?.granted_at
+                      ? tp("grantedOn", {
+                          date: new Date(consent.granted_at).toLocaleDateString(),
+                        })
+                      : tp("notGranted")}
+                  </p>
+                </div>
+                {active && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowRevokeDialog(type)}
+                  >
+                    {tp("revoke")}
+                  </Button>
+                )}
+              </div>
+            );
+          })}
+        </CardContent>
+      </Card>
+
+      {/* Revoke consent confirmation dialog */}
+      <Dialog
+        open={showRevokeDialog !== null}
+        onOpenChange={(open) => !open && setShowRevokeDialog(null)}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{tp("revokeConfirmTitle")}</DialogTitle>
+            <DialogDescription>
+              {tp("revokeConfirmDescription", {
+                warning:
+                  showRevokeDialog === "health_data_processing"
+                    ? tp("revokeWarning")
+                    : "",
+              })}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setShowRevokeDialog(null)}>
+              {tc("cancel")}
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => showRevokeDialog && handleRevokeConsent(showRevokeDialog)}
+            >
+              {tp("revoke")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Separator />
 

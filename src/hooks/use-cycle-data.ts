@@ -86,8 +86,8 @@ export function useCycleData() {
       const phase = getCurrentPhase(cycleDay, effectiveCycleLength, avgPeriodLength);
       const predictions = calculatePredictions(startDate, effectiveCycleLength);
 
-      // Check if currently on period
-      const isOnPeriod = currentCycle.end_date === null && cycleDay <= avgPeriodLength;
+      // Check if currently on period — if no end_date and no period_length recorded, period is still active
+      const isOnPeriod = currentCycle.end_date === null && currentCycle.period_length === null;
 
       setData({
         currentCycle: {

@@ -201,6 +201,29 @@
     "readMore": "Read more",
     "noArticles": "No articles in this category."
   },
+  "consent": {
+    "title": "Privacy Consent",
+    "subtitle": "Before using Cikel, we need your explicit consent to process your health data in accordance with GDPR Article 9.",
+    "healthDataLabel": "I consent to the processing of my health data (menstrual cycle, symptoms, mood)",
+    "healthDataDescription": "This is required to use the app. Your health data is processed solely to provide you with cycle tracking features.",
+    "cyclePredictionsLabel": "I consent to automated cycle predictions based on my health data",
+    "cyclePredictionsDescription": "This is required to use the app. We use your data to predict future cycles, fertile windows, and ovulation dates.",
+    "requiredNotice": "Both consents are required to use Cikel. You can revoke your consent at any time in Settings, but this will restrict your access to the app.",
+    "submit": "I agree and continue",
+    "bothRequired": "Both consents are required to continue."
+  },
+  "privacy": {
+    "title": "Privacy & Consents",
+    "healthDataConsent": "Health data processing",
+    "cyclePredictionsConsent": "Cycle predictions",
+    "grantedOn": "Granted on {date}",
+    "notGranted": "Not granted",
+    "revoke": "Revoke",
+    "revokeWarning": "Revoking the health data processing consent will block your access to the app.",
+    "revokeConfirmTitle": "Revoke consent",
+    "revokeConfirmDescription": "Are you sure you want to revoke this consent? {warning}",
+    "revoked": "Consent revoked."
+  },
   "settings": {
     "title": "Settings",
     "profile": "Profile",

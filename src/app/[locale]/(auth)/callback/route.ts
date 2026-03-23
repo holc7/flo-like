@@ -10,17 +10,9 @@ export async function GET(request: Request) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (!error) {
-      // Check if onboarding is completed
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("onboarding_completed")
-        .single();
-
-      if (profile && !profile.onboarding_completed) {
-        return NextResponse.redirect(`${origin}/onboarding`);
-      }
-
-      return NextResponse.redirect(`${origin}/dashboard`);
+      // After email verification, redirect to consent page first
+      // The middleware will handle further routing if consents are already granted
+      return NextResponse.redirect(`${origin}/consent`);
     }
   }
 
