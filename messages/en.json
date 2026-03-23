@@ -39,7 +39,9 @@
     "emailRequired": "Email is required.",
     "passwordRequired": "Password is required.",
     "passwordMin": "Password must be at least 6 characters.",
-    "passwordsNoMatch": "Passwords don't match."
+    "passwordsNoMatch": "Passwords don't match.",
+    "continueWithGoogle": "Continue with Google",
+    "orDivider": "or"
   },
   "onboarding": {
     "title": "Welcome to Cikel",

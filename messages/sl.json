@@ -39,7 +39,9 @@
     "emailRequired": "E-poštni naslov je obvezen.",
     "passwordRequired": "Geslo je obvezno.",
     "passwordMin": "Geslo mora imeti vsaj 6 znakov.",
-    "passwordsNoMatch": "Gesli se ne ujemata."
+    "passwordsNoMatch": "Gesli se ne ujemata.",
+    "continueWithGoogle": "Nadaljuj z Google",
+    "orDivider": "ali"
   },
   "onboarding": {
     "title": "Dobrodošli v Cikel",
