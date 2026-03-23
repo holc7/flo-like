@@ -78,7 +78,7 @@ create trigger profiles_updated_at
 -- CYCLES
 -- ============================================
 create table public.cycles (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   user_id uuid not null references public.profiles(id) on delete cascade,
   start_date date not null,
   end_date date,
@@ -126,7 +126,7 @@ create type public.cervical_mucus_type as enum (
 );
 
 create table public.daily_logs (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   user_id uuid not null references public.profiles(id) on delete cascade,
   log_date date not null,
   is_period_day boolean not null default false,
@@ -178,7 +178,7 @@ create type public.article_category as enum (
 );
 
 create table public.articles (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   slug text unique not null,
   title_sl text not null,
   title_en text not null,
@@ -211,7 +211,7 @@ create index idx_articles_slug on public.articles(slug);
 -- PUSH SUBSCRIPTIONS
 -- ============================================
 create table public.push_subscriptions (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   user_id uuid not null references public.profiles(id) on delete cascade,
   endpoint text not null,
   p256dh text not null,
@@ -238,7 +238,7 @@ create policy "Users can delete own subscriptions"
 -- NOTIFICATION LOG
 -- ============================================
 create table public.notification_log (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   user_id uuid not null references public.profiles(id) on delete cascade,
   notification_type text not null,
   sent_at timestamptz not null default now(),
