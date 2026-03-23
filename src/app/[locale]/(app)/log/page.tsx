@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { useDailyLog } from "@/hooks/use-daily-log";
 import { Card, CardContent } from "@/components/ui/card";
@@ -38,7 +38,7 @@ export default function LogPage() {
   const [notes, setNotes] = useState("");
 
   // Sync state when log data loads
-  useState(() => {
+  useEffect(() => {
     if (log) {
       setIsPeriodDay(log.isPeriodDay);
       setFlowIntensity(log.flowIntensity);
@@ -53,7 +53,7 @@ export default function LogPage() {
       setCervicalMucus(log.cervicalMucus);
       setNotes(log.notes || "");
     }
-  });
+  }, [log]);
 
   function toggleSymptom(
     symptom: string,

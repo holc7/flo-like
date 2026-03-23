@@ -43,22 +43,23 @@ export default function CalendarPage() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("avg_cycle_length, avg_period_length")
-        .eq("id", user.id)
-        .single();
-
-      const { data: cycles } = await supabase
-        .from("cycles")
-        .select("*")
-        .eq("user_id", user.id)
-        .order("start_date", { ascending: false });
-
-      const { data: logs } = await supabase
-        .from("daily_logs")
-        .select("log_date, is_period_day")
-        .eq("user_id", user.id);
+      const [{ data: profile }, { data: cycles }, { data: logs }] = await Promise.all([
+        supabase
+          .from("profiles")
+          .select("avg_cycle_length, avg_period_length")
+          .eq("id", user.id)
+          .single(),
+        supabase
+          .from("cycles")
+          .select("id, start_date, end_date, cycle_length, period_length, is_predicted")
+          .eq("user_id", user.id)
+          .order("start_date", { ascending: false })
+          .limit(12),
+        supabase
+          .from("daily_logs")
+          .select("log_date, is_period_day")
+          .eq("user_id", user.id),
+      ]);
 
       const map = new Map<string, DayInfo>();
       const logDates = new Set(logs?.map((l) => l.log_date) || []);
@@ -157,7 +158,7 @@ export default function CalendarPage() {
     }
 
     fetchData();
-  }, [month]);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps -- data is not month-specific
 
   const monthLabel = format(month, "LLLL yyyy", {
     locale: locale === "sl" ? sl : undefined,

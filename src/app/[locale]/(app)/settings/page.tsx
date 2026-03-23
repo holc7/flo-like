@@ -43,6 +43,7 @@ export default function SettingsPage() {
   const t = useTranslations("settings");
   const tp = useTranslations("privacy");
   const tc = useTranslations("common");
+  const tAuth = useTranslations("auth");
   const locale = useLocale();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
@@ -59,19 +60,19 @@ export default function SettingsPage() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      const { data } = await supabase
-        .from("profiles")
-        .select("display_name, date_of_birth, locale, avg_cycle_length, avg_period_length, notifications_enabled, period_reminder_days, fertile_reminder")
-        .eq("id", user.id)
-        .single();
+      const [{ data }, { data: consentData }] = await Promise.all([
+        supabase
+          .from("profiles")
+          .select("display_name, date_of_birth, locale, avg_cycle_length, avg_period_length, notifications_enabled, period_reminder_days, fertile_reminder")
+          .eq("id", user.id)
+          .single(),
+        supabase
+          .from("consents")
+          .select("consent_type, granted_at, revoked_at")
+          .eq("user_id", user.id),
+      ]);
 
       if (data) setProfile(data);
-
-      const { data: consentData } = await supabase
-        .from("consents")
-        .select("consent_type, granted_at, revoked_at")
-        .eq("user_id", user.id);
-
       if (consentData) setConsents(consentData);
       setLoading(false);
     }
@@ -154,6 +155,9 @@ export default function SettingsPage() {
       .update({ revoked_at: new Date().toISOString() })
       .eq("user_id", user.id)
       .eq("consent_type", type);
+
+    // Clear consent cookie so middleware re-checks
+    document.cookie = "consent_granted=; path=/; max-age=0";
 
     setConsents((prev) =>
       prev.map((c) =>
@@ -432,7 +436,7 @@ export default function SettingsPage() {
       <form action={logout}>
         <Button variant="ghost" type="submit" className="w-full gap-2 text-muted-foreground">
           <LogOut className="h-4 w-4" />
-          {useTranslations("auth")("logout")}
+          {tAuth("logout")}
         </Button>
       </form>
 

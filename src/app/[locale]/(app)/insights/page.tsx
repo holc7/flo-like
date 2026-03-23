@@ -29,6 +29,7 @@ interface SymptomCount {
 export default function InsightsPage() {
   const t = useTranslations("insights");
   const tLog = useTranslations("log");
+  const tc = useTranslations("common");
   const [loading, setLoading] = useState(true);
   const [avgCycleLength, setAvgCycleLength] = useState(0);
   const [avgPeriodLength, setAvgPeriodLength] = useState(0);
@@ -41,15 +42,25 @@ export default function InsightsPage() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Fetch cycles
-      const { data: cycles } = await supabase
-        .from("cycles")
-        .select("start_date, cycle_length, period_length")
-        .eq("user_id", user.id)
-        .eq("is_predicted", false)
-        .not("cycle_length", "is", null)
-        .order("start_date", { ascending: true })
-        .limit(12);
+      // Fetch cycles and symptom data in parallel
+      const threeMonthsAgo = new Date();
+      threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+
+      const [{ data: cycles }, { data: logs }] = await Promise.all([
+        supabase
+          .from("cycles")
+          .select("start_date, cycle_length, period_length")
+          .eq("user_id", user.id)
+          .eq("is_predicted", false)
+          .not("cycle_length", "is", null)
+          .order("start_date", { ascending: true })
+          .limit(12),
+        supabase
+          .from("daily_logs")
+          .select("physical_symptoms, emotional_symptoms")
+          .eq("user_id", user.id)
+          .gte("log_date", threeMonthsAgo.toISOString().split("T")[0]),
+      ]);
 
       if (cycles && cycles.length > 0) {
         const lengths = cycles.map((c, i) => ({
@@ -71,12 +82,6 @@ export default function InsightsPage() {
           setAvgPeriodLength(avgP);
         }
       }
-
-      // Fetch symptom data
-      const { data: logs } = await supabase
-        .from("daily_logs")
-        .select("physical_symptoms, emotional_symptoms")
-        .eq("user_id", user.id);
 
       if (logs) {
         const counts = new Map<string, number>();
@@ -131,7 +136,7 @@ export default function InsightsPage() {
             <p className="text-xs text-muted-foreground">{t("avgCycleLength")}</p>
             <p className="text-2xl font-bold text-primary">{avgCycleLength}</p>
             <p className="text-xs text-muted-foreground">
-              {useTranslations("common")("days")}
+              {tc("days")}
             </p>
           </CardContent>
         </Card>
@@ -140,7 +145,7 @@ export default function InsightsPage() {
             <p className="text-xs text-muted-foreground">{t("avgPeriodLength")}</p>
             <p className="text-2xl font-bold text-period">{avgPeriodLength}</p>
             <p className="text-xs text-muted-foreground">
-              {useTranslations("common")("days")}
+              {tc("days")}
             </p>
           </CardContent>
         </Card>

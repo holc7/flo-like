@@ -17,6 +17,7 @@ import { useState } from "react";
 export default function DashboardPage() {
   const t = useTranslations("dashboard");
   const tc = useTranslations("common");
+  const tNav = useTranslations("nav");
   const {
     currentCycle,
     cycleDay,
@@ -56,21 +57,21 @@ export default function DashboardPage() {
             .eq("id", currentCycle.id);
         }
 
-        await supabase.from("cycles").insert({
-          user_id: user.id,
-          start_date: today,
-        });
-
-        // Also log today as a period day
-        await supabase.from("daily_logs").upsert(
-          {
+        await Promise.all([
+          supabase.from("cycles").insert({
             user_id: user.id,
-            log_date: today,
-            is_period_day: true,
-            flow_intensity: 3,
-          },
-          { onConflict: "user_id,log_date" }
-        );
+            start_date: today,
+          }),
+          supabase.from("daily_logs").upsert(
+            {
+              user_id: user.id,
+              log_date: today,
+              is_period_day: true,
+              flow_intensity: 3,
+            },
+            { onConflict: "user_id,log_date" }
+          ),
+        ]);
       }
 
       await refetch();
@@ -160,7 +161,7 @@ export default function DashboardPage() {
         <Link href="/calendar">
           <Button variant="outline" className="w-full gap-2">
             <Calendar className="h-4 w-4" />
-            {useTranslations("nav")("calendar")}
+            {tNav("calendar")}
           </Button>
         </Link>
       </div>

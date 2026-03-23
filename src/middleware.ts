@@ -67,41 +67,53 @@ export async function middleware(request: NextRequest) {
   }
 
   // Check consent status for authenticated users (before onboarding check)
+  // Use cookie cache to avoid DB query on every request
   if (user && !isPublic && !isConsent) {
-    // Create a Supabase client that can read from the request cookies
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() {
-            return request.cookies.getAll();
+    const consentCookie = request.cookies.get("consent_granted")?.value;
+
+    if (consentCookie !== "true") {
+      const supabase = createServerClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+          cookies: {
+            getAll() {
+              return request.cookies.getAll();
+            },
+            setAll() {},
           },
-          setAll() {},
-        },
-      }
-    );
+        }
+      );
 
-    const { data: consents } = await supabase
-      .from("consents")
-      .select("consent_type")
-      .eq("user_id", user.id)
-      .is("revoked_at", null)
-      .not("granted_at", "is", null);
+      const { data: consents } = await supabase
+        .from("consents")
+        .select("consent_type")
+        .eq("user_id", user.id)
+        .is("revoked_at", null)
+        .not("granted_at", "is", null);
 
-    const activeTypes = (consents || []).map((c) => c.consent_type);
-    const hasHealthConsent = activeTypes.includes("health_data_processing");
-    const hasCycleConsent = activeTypes.includes("cycle_predictions");
+      const activeTypes = (consents || []).map((c) => c.consent_type);
+      const hasHealthConsent = activeTypes.includes("health_data_processing");
+      const hasCycleConsent = activeTypes.includes("cycle_predictions");
 
-    if (!hasHealthConsent || !hasCycleConsent) {
-      const consentUrl = new URL("/consent", request.url);
-      const redirectResponse = NextResponse.redirect(consentUrl);
-      supabaseResponse.cookies.getAll().forEach((cookie) => {
-        redirectResponse.cookies.set(cookie.name, cookie.value, {
-          ...cookie,
+      if (!hasHealthConsent || !hasCycleConsent) {
+        const consentUrl = new URL("/consent", request.url);
+        const redirectResponse = NextResponse.redirect(consentUrl);
+        supabaseResponse.cookies.getAll().forEach((cookie) => {
+          redirectResponse.cookies.set(cookie.name, cookie.value, {
+            ...cookie,
+          });
         });
+        return redirectResponse;
+      }
+
+      // Cache consent status in cookie to skip DB query next time
+      intlResponse.cookies.set("consent_granted", "true", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 60 * 60 * 24 * 30, // 30 days
       });
-      return redirectResponse;
     }
   }
 

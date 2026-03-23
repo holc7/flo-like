@@ -57,6 +57,9 @@ export default function ConsentPage() {
       return;
     }
 
+    // Set consent cookie so middleware skips DB check
+    document.cookie = "consent_granted=true; path=/; max-age=2592000; samesite=lax";
+
     router.push("/onboarding");
   }
 

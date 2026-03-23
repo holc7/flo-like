@@ -49,21 +49,21 @@ export function useCycleData() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    // Fetch profile
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("avg_cycle_length, avg_period_length, last_period_start")
-      .eq("id", user.id)
-      .single();
-
-    // Fetch cycles (most recent first)
-    const { data: cycles } = await supabase
-      .from("cycles")
-      .select("*")
-      .eq("user_id", user.id)
-      .eq("is_predicted", false)
-      .order("start_date", { ascending: false })
-      .limit(12);
+    // Fetch profile and cycles in parallel
+    const [{ data: profile }, { data: cycles }] = await Promise.all([
+      supabase
+        .from("profiles")
+        .select("avg_cycle_length, avg_period_length, last_period_start")
+        .eq("id", user.id)
+        .single(),
+      supabase
+        .from("cycles")
+        .select("id, start_date, end_date, cycle_length, period_length, is_predicted")
+        .eq("user_id", user.id)
+        .eq("is_predicted", false)
+        .order("start_date", { ascending: false })
+        .limit(12),
+    ]);
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
