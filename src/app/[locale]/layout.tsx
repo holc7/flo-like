@@ -2,13 +2,21 @@ import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getMessages } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/lib/i18n/routing";
-import { Geist } from "next/font/google";
+import { Fraunces, Instrument_Sans } from "next/font/google";
 import type { Metadata, Viewport } from "next";
 import "../globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+const instrumentSans = Instrument_Sans({
+  variable: "--font-instrument-sans",
+  subsets: ["latin", "latin-ext"], // latin-ext covers Slovenian/Croatian diacritics (č, š, ž, ć, đ)
+  weight: ["400", "500", "600", "700"],
+});
+
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
+  subsets: ["latin", "latin-ext"],
+  weight: ["400", "500", "600"],
+  style: ["normal", "italic"],
 });
 
 export const metadata: Metadata = {
@@ -17,7 +25,7 @@ export const metadata: Metadata = {
     template: "%s | Cikel",
   },
   description:
-    "Cikel — Sledenje menstrualnemu ciklu | Period cycle tracking app",
+    "Cikel — Topla, zasebna spremljevalka tvojega cikla. A warm, private cycle companion.",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
@@ -27,7 +35,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#E8A0BF",
+  themeColor: "#3a5a40", // Gozd accent
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
@@ -50,7 +58,12 @@ export default async function LocaleLayout({
   const messages = await getMessages();
 
   return (
-    <html lang={locale} className={geistSans.variable}>
+    <html
+      lang={locale}
+      data-brand="gozd"
+      className={`${instrumentSans.variable} ${fraunces.variable}`}
+      suppressHydrationWarning
+    >
       <body className="min-h-screen bg-background text-foreground antialiased">
         <NextIntlClientProvider messages={messages}>
           {children}

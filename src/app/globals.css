@@ -1,62 +1,209 @@
 @import "tailwindcss";
 
+/*
+  Cikel — Warm paper design system
+  Default brand: Gozd (forest green)
+  Alt variants: Glina (terracotta), Sliva (plum) — switch via [data-brand] on <html>
+  Dark mode: [data-theme="dark"] on <html>
+
+  Typography:
+    --font-sans   — Instrument Sans (body/UI)
+    --font-serif  — Fraunces (display/serif)
+*/
+
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-primary: #E8A0BF;
-  --color-primary-foreground: #ffffff;
-  --color-secondary: #F3E5F5;
-  --color-secondary-foreground: #4A154B;
-  --color-muted: #F5F0F5;
-  --color-muted-foreground: #6B5B6E;
-  --color-accent: #F8BBD0;
-  --color-accent-foreground: #880E4F;
-  --color-destructive: #EF4444;
+  --color-background: var(--bg);
+  --color-foreground: var(--ink);
+
+  --color-primary: var(--accent);
+  --color-primary-foreground: var(--accent-ink);
+  --color-secondary: var(--accent-soft);
+  --color-secondary-foreground: var(--accent);
+  --color-muted: var(--surface-alt);
+  --color-muted-foreground: var(--ink-muted);
+  --color-accent: var(--accent-soft);
+  --color-accent-foreground: var(--accent);
+  --color-destructive: var(--flow);
   --color-destructive-foreground: #ffffff;
-  --color-border: #E8D5E8;
-  --color-input: #E8D5E8;
-  --color-ring: #E8A0BF;
-  --color-card: #ffffff;
-  --color-card-foreground: #1a1a2e;
-  --color-period: #E57373;
-  --color-period-predicted: #F8BBD0;
-  --color-fertile: #81C784;
-  --color-ovulation: #4FC3F7;
+  --color-border: var(--border);
+  --color-input: var(--border);
+  --color-ring: var(--accent);
+  --color-card: var(--surface);
+  --color-card-foreground: var(--ink);
 
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Cycle phase tokens — warm, no pink */
+  --color-period: var(--flow);
+  --color-period-predicted: var(--flow-soft);
+  --color-fertile: var(--fertile);
+  --color-ovulation: var(--ovulation);
 
-  --radius-sm: 0.375rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 0.75rem;
-  --radius-xl: 1rem;
+  --font-sans: "Instrument Sans", system-ui, -apple-system, sans-serif;
+  --font-serif: "Fraunces", Georgia, serif;
+
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.25rem;
   --radius-2xl: 1.5rem;
 }
 
-:root {
-  --background: #FFF8F9;
-  --foreground: #1a1a2e;
+/* ============================================
+   GOZD — forest green (default)
+   ============================================ */
+:root,
+:root[data-brand="gozd"] {
+  --bg: #f4efe6;
+  --surface: #fbf7ee;
+  --surface-alt: #efe8da;
+  --ink: #1f2a21;
+  --ink-muted: #5b6a5d;
+  --ink-faint: #8c9a8e;
+  --border: #e0d8c6;
+
+  --accent: #3a5a40;
+  --accent-soft: #d9e2d5;
+  --accent-ink: #fbf7ee;
+
+  --flow: #9a3b2c;
+  --flow-soft: #e8d3cc;
+  --fertile: #6b8e5a;
+  --ovulation: #c48a3a;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #1a1a2e;
-    --foreground: #FFF8F9;
-  }
+:root[data-theme="dark"],
+:root[data-brand="gozd"][data-theme="dark"] {
+  --bg: #16201a;
+  --surface: #1d2a22;
+  --surface-alt: #223128;
+  --ink: #ece5d4;
+  --ink-muted: #a8b3a8;
+  --ink-faint: #6f7a6f;
+  --border: #2e3d33;
+
+  --accent: #a3c294;
+  --accent-soft: #2a3a2f;
+  --accent-ink: #16201a;
+
+  --flow: #d98c7a;
+  --flow-soft: #3a2a26;
+  --fertile: #9bb888;
+  --ovulation: #d9a86a;
 }
 
+/* ============================================
+   GLINA — terracotta clay
+   ============================================ */
+:root[data-brand="glina"] {
+  --bg: #efe7db;
+  --surface: #f7f0e4;
+  --surface-alt: #e8dfd0;
+  --ink: #2a211a;
+  --ink-muted: #6b5d50;
+  --ink-faint: #9a8c7e;
+  --border: #ddd2be;
+
+  --accent: #b95f3e;
+  --accent-soft: #ecd8ca;
+  --accent-ink: #f7f0e4;
+
+  --flow: #a84b33;
+  --flow-soft: #ecd1c6;
+  --fertile: #7a8c5d;
+  --ovulation: #c98a3a;
+}
+
+:root[data-brand="glina"][data-theme="dark"] {
+  --bg: #1e1712;
+  --surface: #2a2018;
+  --surface-alt: #33261d;
+  --ink: #ede3d2;
+  --ink-muted: #b0a292;
+  --ink-faint: #746557;
+  --border: #3a2d22;
+
+  --accent: #d98566;
+  --accent-soft: #3a2720;
+  --accent-ink: #1e1712;
+
+  --flow: #d98566;
+  --flow-soft: #3a2720;
+  --fertile: #a3b88a;
+  --ovulation: #d9a86a;
+}
+
+/* ============================================
+   SLIVA — plum
+   ============================================ */
+:root[data-brand="sliva"] {
+  --bg: #f0eae8;
+  --surface: #f8f2ef;
+  --surface-alt: #e8dfdc;
+  --ink: #251d23;
+  --ink-muted: #675662;
+  --ink-faint: #9a8a94;
+  --border: #ddd0d4;
+
+  --accent: #6e3a52;
+  --accent-soft: #e6d4dd;
+  --accent-ink: #f8f2ef;
+
+  --flow: #8a3246;
+  --flow-soft: #ead0d7;
+  --fertile: #7a8c5d;
+  --ovulation: #c48a3a;
+}
+
+:root[data-brand="sliva"][data-theme="dark"] {
+  --bg: #1d1418;
+  --surface: #281d24;
+  --surface-alt: #30232b;
+  --ink: #ebdfe4;
+  --ink-muted: #b09aa6;
+  --ink-faint: #745d6a;
+  --border: #3a2a33;
+
+  --accent: #c38aa2;
+  --accent-soft: #3a2530;
+  --accent-ink: #1d1418;
+
+  --flow: #d98ea2;
+  --flow-soft: #3a2530;
+  --fertile: #a3b88a;
+  --ovulation: #d9a86a;
+}
+
+/* ============================================
+   Base
+   ============================================ */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-sans), system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Smooth scrolling */
 html {
   scroll-behavior: smooth;
 }
 
-/* PWA status bar */
+/* Reserve serif for display */
+.font-serif,
+h1.serif,
+h2.serif,
+h3.serif {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+/* Sova thinking pulse */
+@keyframes sovaPulse {
+  0%, 100% { opacity: 0.3; transform: scale(0.8); }
+  50%      { opacity: 1;   transform: scale(1); }
+}
+
+/* PWA safe area */
 @supports (padding-top: env(safe-area-inset-top)) {
   body {
     padding-top: env(safe-area-inset-top);

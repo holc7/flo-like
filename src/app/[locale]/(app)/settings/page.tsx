@@ -103,7 +103,7 @@ export default function SettingsPage() {
 
     // Switch locale if changed
     if (profile.locale !== locale) {
-      router.replace("/settings", { locale: profile.locale as "sl" | "en" });
+      router.replace("/settings", { locale: profile.locale as "sl" | "en" | "hr" });
     }
   }
 
@@ -220,7 +220,7 @@ export default function SettingsPage() {
           <div className="space-y-2">
             <Label>{t("language")}</Label>
             <div className="flex gap-2">
-              {(["sl", "en"] as const).map((l) => (
+              {(["sl", "en", "hr"] as const).map((l) => (
                 <button
                   key={l}
                   onClick={() => setProfile({ ...profile, locale: l })}
@@ -230,7 +230,7 @@ export default function SettingsPage() {
                       : "bg-muted text-muted-foreground"
                   }`}
                 >
-                  {l === "sl" ? "Slovenščina" : "English"}
+                  {l === "sl" ? "Slovenščina" : l === "hr" ? "Hrvatski" : "English"}
                 </button>
               ))}
             </div>

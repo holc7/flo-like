@@ -1,10 +1,13 @@
+// Cikel — cycle phase colors reference CSS custom properties (see globals.css)
+// so they automatically adapt to the active brand + dark mode.
+
 export const CYCLE_COLORS = {
-  period: "#E57373",
-  predictedPeriod: "#F8BBD0",
-  fertile: "#81C784",
-  ovulation: "#4FC3F7",
-  background: "#FFF8F9",
-  primary: "#E8A0BF",
+  period: "var(--flow)",
+  predictedPeriod: "var(--flow-soft)",
+  fertile: "var(--fertile)",
+  ovulation: "var(--ovulation)",
+  background: "var(--bg)",
+  primary: "var(--accent)",
 } as const;
 
 export const DEFAULT_CYCLE_LENGTH = 28;
@@ -46,3 +49,5 @@ export type CervicalMucusType =
   | "creamy"
   | "watery"
   | "egg_white";
+
+export type BrandVariant = "gozd" | "glina" | "sliva";

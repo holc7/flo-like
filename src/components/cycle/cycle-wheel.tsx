@@ -1,6 +1,6 @@
 "use client";
 
-import { CYCLE_COLORS } from "@/lib/cycle/constants";
+import { getPhaseColor } from "@/lib/cycle/phases";
 import type { CyclePhase } from "@/lib/cycle/constants";
 
 interface CycleWheelProps {
@@ -16,119 +16,100 @@ export function CycleWheel({
   periodLength,
   phase,
 }: CycleWheelProps) {
-  const size = 220;
-  const strokeWidth = 12;
-  const radius = (size - strokeWidth) / 2;
+  const size = 260;
+  const strokeWidth = 2;
+  const radius = (size - strokeWidth) / 2 - 8;
   const center = size / 2;
-  const circumference = 2 * Math.PI * radius;
 
-  // Calculate segments
-  const periodAngle = (periodLength / cycleLength) * 360;
   const ovulationDay = cycleLength - 14;
   const fertileStartDay = ovulationDay - 5;
   const fertileEndDay = ovulationDay + 1;
-  const fertileAngle = ((fertileEndDay - fertileStartDay) / cycleLength) * 360;
-  const fertileStartAngle = (fertileStartDay / cycleLength) * 360;
 
-  // Current day position
   const dayAngle = ((cycleDay - 1) / cycleLength) * 360 - 90;
   const dayRad = (dayAngle * Math.PI) / 180;
-  const indicatorRadius = radius - 20;
-  const dayX = center + indicatorRadius * Math.cos(dayRad);
-  const dayY = center + indicatorRadius * Math.sin(dayRad);
+  const dayX = center + radius * Math.cos(dayRad);
+  const dayY = center + radius * Math.sin(dayRad);
 
-  function describeArc(startAngle: number, endAngle: number): string {
-    const start = ((startAngle - 90) * Math.PI) / 180;
-    const end = ((endAngle - 90) * Math.PI) / 180;
-    const x1 = center + radius * Math.cos(start);
-    const y1 = center + radius * Math.sin(start);
-    const x2 = center + radius * Math.cos(end);
-    const y2 = center + radius * Math.sin(end);
+  function describeArc(startDay: number, endDay: number, r: number): string {
+    const startAngle = ((startDay - 1) / cycleLength) * 360 - 90;
+    const endAngle = ((endDay - 1) / cycleLength) * 360 - 90;
+    const start = (startAngle * Math.PI) / 180;
+    const end = (endAngle * Math.PI) / 180;
+    const x1 = center + r * Math.cos(start);
+    const y1 = center + r * Math.sin(start);
+    const x2 = center + r * Math.cos(end);
+    const y2 = center + r * Math.sin(end);
     const largeArc = endAngle - startAngle > 180 ? 1 : 0;
-    return `M ${x1} ${y1} A ${radius} ${radius} 0 ${largeArc} 1 ${x2} ${y2}`;
+    return `M ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2}`;
   }
-
-  const phaseColors: Record<CyclePhase, string> = {
-    menstrual: CYCLE_COLORS.period,
-    follicular: CYCLE_COLORS.primary,
-    ovulation: CYCLE_COLORS.ovulation,
-    luteal: CYCLE_COLORS.fertile,
-  };
 
   return (
     <div className="flex items-center justify-center">
       <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-        {/* Background circle */}
+        {/* Base thin ring */}
         <circle
           cx={center}
           cy={center}
           r={radius}
           fill="none"
-          stroke="currentColor"
+          stroke="var(--border)"
           strokeWidth={strokeWidth}
-          className="text-muted"
         />
 
-        {/* Period segment */}
+        {/* Period arc (thicker, warm flow tone) */}
         <path
-          d={describeArc(0, periodAngle)}
+          d={describeArc(1, periodLength + 1, radius)}
           fill="none"
-          stroke={CYCLE_COLORS.period}
-          strokeWidth={strokeWidth}
+          stroke="var(--flow)"
+          strokeWidth={8}
           strokeLinecap="round"
         />
 
-        {/* Fertile window segment */}
+        {/* Fertile window arc */}
         <path
-          d={describeArc(fertileStartAngle, fertileStartAngle + fertileAngle)}
+          d={describeArc(fertileStartDay, fertileEndDay + 1, radius)}
           fill="none"
-          stroke={CYCLE_COLORS.fertile}
-          strokeWidth={strokeWidth}
+          stroke="var(--fertile)"
+          strokeWidth={8}
           strokeLinecap="round"
+          opacity="0.85"
         />
 
         {/* Ovulation dot */}
         {(() => {
-          const ovAngle = ((ovulationDay / cycleLength) * 360 - 90) * (Math.PI / 180);
+          const a = (((ovulationDay - 1) / cycleLength) * 360 - 90) * (Math.PI / 180);
           return (
             <circle
-              cx={center + radius * Math.cos(ovAngle)}
-              cy={center + radius * Math.sin(ovAngle)}
-              r={strokeWidth / 2 + 2}
-              fill={CYCLE_COLORS.ovulation}
+              cx={center + radius * Math.cos(a)}
+              cy={center + radius * Math.sin(a)}
+              r={5}
+              fill="var(--ovulation)"
             />
           );
         })()}
 
-        {/* Day indicator */}
-        <circle
-          cx={dayX}
-          cy={dayY}
-          r={8}
-          fill={phaseColors[phase]}
-          stroke="white"
-          strokeWidth={3}
-        />
+        {/* Current day marker */}
+        <circle cx={dayX} cy={dayY} r={10} fill={getPhaseColor(phase)} />
+        <circle cx={dayX} cy={dayY} r={4} fill="var(--surface)" />
 
-        {/* Center text */}
+        {/* Center numerals — Fraunces display */}
         <text
           x={center}
-          y={center - 8}
+          y={center + 4}
           textAnchor="middle"
-          className="fill-foreground text-3xl font-bold"
-          fontSize="32"
-          fontWeight="bold"
+          fill="var(--ink)"
+          style={{ fontFamily: "var(--font-serif)", fontWeight: 500, fontSize: 56, letterSpacing: "-0.03em" }}
         >
           {cycleDay}
         </text>
         <text
           x={center}
-          y={center + 16}
+          y={center + 30}
           textAnchor="middle"
-          className="fill-muted-foreground text-xs"
-          fontSize="12"
+          fill="var(--ink-muted)"
+          style={{ fontFamily: "var(--font-sans)", fontSize: 11, letterSpacing: "0.08em", textTransform: "uppercase" }}
         >
-          / {cycleLength}
+          dan cikla
         </text>
       </svg>
     </div>
